@@ -1,0 +1,26 @@
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:http="http://www.mulesoft.org/schema/mule/http"
+xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+<http:listener-config name="listener-config" host="localhost" port="63081" doc:name="HTTP Listener Configuration"/>
+	<http:request-config name="HTTP_Request_Configuration1" host="127.0.0.1" port="8082" doc:name="HTTP Request Configuration"/>
+<flow name="helloService12">
+<http:listener config-ref="listener-config" path="hello" doc:name="HTTP"/>
+<cxf:jaxws-service serviceClass="hello.HelloWorld" doc:name="CXF"/>
+<component class="hello.HelloWorldImpl" doc:name="Java"/>
+		<response>
+			<object-to-string-transformer doc:name="Object to String"/>
+		</response>
+		<component class="hello.helloWorldComponent" doc:name="Java"/>
+		<logger message="#[flowVars.'redirectUrl']" level="INFO" doc:name="Logger"/>
+	
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+		<http:request config-ref="HTTP_Request_Configuration1" path="#[flowVars.'redirectUrl']" method="POST" doc:name="HTTP"/>
+	
+</flow>
+</mule>
